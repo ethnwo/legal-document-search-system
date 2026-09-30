@@ -2,41 +2,71 @@ from sentence_transformers import SentenceTransformer
 from app.data.loader import load_cases
 import numpy as np
 import faiss
+import os
+import json
 
 class SemanticRetriever:
     def __init__(self, cases):
         self.cases = cases
+        self.index_dir = "indexes/semantic"
+        self.index_path = os.path.join(self.index_dir, "index.faiss")
+        self.mapping_path = os.path.join(self.index_dir, "chunk_case_indices.npy")
+        self.chunks_path = os.path.join(self.index_dir, "chunks.json")
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
 
+        if os.path.exists(self.index_path) and os.path.exists(self.mapping_path) and os.path.exists(self.chunks_path):
+            self.load_index()
+        else:
+            self.build_index()
+
+    def build_index(self):
         self.chunks = []
         self.chunk_case_indices = []
 
-        for case_index, case in enumerate(cases):
+        for case_index, case in enumerate(self.cases):
             words = case["text"].split()
             chunk_size = 200
             overlap = 50
 
-            for start in range(0, len(words), chunk_size - overlap):
+            for start in range(0, len(words), chunk_size-overlap):
                 chunk = " ".join(words[start:start + chunk_size])
                 if not chunk.strip():
                     continue
                 self.chunks.append(chunk)
                 self.chunk_case_indices.append(case_index)
 
-        print(f"Total chunks: {len(self.chunks)}")
+            print(f"Total chunks: {len(self.chunks)}")
 
         self.embeddings = self.model.encode(
             self.chunks,
-            batch_size = 32,
-            show_progress_bar = True,
-            convert_to_numpy = True,
-            normalize_embeddings = True
+            batch_size=32,
+            show_progress_bar=True,
+            convert_to_numpy=True,
+            normalize_embeddings=True
         )
 
         dimension = self.embeddings.shape[1]
         self.index = faiss.IndexFlatIP(dimension)
         self.index.add(self.embeddings.astype(np.float32))
         print("Semantic index created successfully.")
+
+        os.makedirs(self.index_dir, exist_ok = True)
+        faiss.write_index(self.index, self.index_path)
+        np.save(self.mapping_path, np.array(self.chunk_case_indices))
+
+        with open(self.chunks_path, "w", encoding = "utf-8") as file:
+            json.dump(self.chunks, file)
+
+        print("Semantic index saved successfully.")
+
+    def load_index(self):
+        self.index = faiss.read_index(self.index_path)
+        self.chunk_case_indices = np.load(self.mapping_path).tolist()
+
+        with open(self.chunks_path, "r", encoding="utf-8") as file:
+            self.chunks = json.load(file)
+
+        print("Semantic index loaded successfully.")    
 
     def search(self, query, top_k=5):
         query_embedding = self.model.encode(
@@ -57,19 +87,19 @@ class SemanticRetriever:
             if (case_index not in case_scores or score > case_scores[case_index]):
                 case_scores[case_index] = float(score)
 
-        ranked_cases = sorted(case_scores.items(), key = lambda item:item[1], reverse = True)[:top_k]
+        ranked_cases = sorted(case_scores.items(), key=lambda item:item[1], reverse=True)[:top_k]
         results = []
 
         for case_index, score in ranked_cases:
             case = self.cases[case_index]
             results.append({
-                "case_id": case["case_id"],
-                "case_name": case["case_name"],
-                "decision_date": case["decision_date"],
-                "court": case["court"],
-                "jurisdiction": case["jurisdiction"],
-                "citation": case["citation"],
-                "score": score
+                "case_id":case["case_id"],
+                "case_name":case["case_name"],
+                "decision_date":case["decision_date"],
+                "court":case["court"],
+                "jurisdiction":case["jurisdiction"],
+                "citation":case["citation"],
+                "score":score
             })
 
         return results
