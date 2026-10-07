@@ -1,121 +1,117 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSearch = async () => {
+    if (!query.trim()) {
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/search?query=${encodeURIComponent(query)}`)
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch search results')
+      }
+
+      const data = await response.json()
+      setResults(data.results)
+    } catch (err) {
+      setError('Unable to connect to the search API.')
+      setResults([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleSearch()
+    }
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <main className="app">
+      <header className="header">
+        <h1>Legal Document Search System</h1>
+        <p>Search a collection of legal cases using hybrid retrieval.</p>
+      </header>
+
+      <section className="search-selection">
+        <div className="search-bar">
+          <input
+            type="text"
+            placeholder="Enter your legal query..."
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+
+          <button onClick={handleSearch} disabled={loading}>
+            {loading ? 'Searching...' : 'Search'}
+          </button>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+      </section>
+
+      <section className="results-section">
+        {error && <p className="error">{error}</p>}
+
+        {!loading && !error && results.length === 0 && (
+          <p className="placeholder">
+            Enter a query to search the legal case database.
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+        )}
+
+        {results.length > 0 && (
+          <>
+            <h2>Search Results</h2>
+            <div className="results">
+              {results.map((result, index) => (
+                <article className="result-card" key={result.case_id}>
+                  <div className="result-rank">
+                    #{index + 1}
+                  </div>
+
+                  <div className="result-content">
+                    <h3>{result.case_name}</h3>
+
+                    <p className="case-info">
+                      {result.citation} - {result.decision_date}
+                    </p>
+
+                    <p className="case-court">
+                      {result.court}
+                    </p>
+
+                    <div className="ranking-info">
+                      <span>
+                        RRF Score: {result.rrf_score.toFixed(6)}
+                      </span>
+
+                      <span>
+                        BM25 Rank: #{result.bm25_rank ?? '-'}
+                      </span>
+
+                      <span>
+                        Semantic Rank: #{result.semantic_rank ?? '-'}
+                      </span>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>  
+          </>
+        )}
       </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    </main>
   )
 }
 
