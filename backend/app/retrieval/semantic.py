@@ -94,11 +94,6 @@ class SemanticRetriever:
             case = self.cases[case_index]
             results.append({
                 "case_id":case["case_id"],
-                "case_name":case["case_name"],
-                "decision_date":case["decision_date"],
-                "court":case["court"],
-                "jurisdiction":case["jurisdiction"],
-                "citation":case["citation"],
                 "score":score
             })
 

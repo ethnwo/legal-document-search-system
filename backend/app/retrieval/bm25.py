@@ -58,11 +58,6 @@ class BM25Retriever:
             case = self.cases[index]
             results.append({
                 "case_id": case["case_id"],
-                "case_name": case["case_name"],
-                "decision_date": case["decision_date"],
-                "court": case["court"],
-                "jurisdiction": case["jurisdiction"],
-                "citation": case["citation"],
                 "score": float(scores[index])
             })
         return results

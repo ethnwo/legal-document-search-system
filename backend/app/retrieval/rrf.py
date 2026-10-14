@@ -8,7 +8,7 @@ class RRF:
         self.semantic = semantic_retriever
         self.k = k
 
-    def search(self, query, top_k=5, fusion_k=50):
+    def search(self, query, top_k=5, fusion_k=200):
         bm25_results = self.bm25.search(query, top_k=fusion_k)
         semantic_results = self.semantic.search(query, top_k=fusion_k)
 
@@ -53,10 +53,12 @@ class RRF:
         results = []
 
         for case_id, rrf_score in ranked_cases[:top_k]:
-            result = case_lookup[case_id].copy()
-            result["bm25_rank"] = bm25_ranks.get(case_id)
-            result["semantic_rank"] = semantic_ranks.get(case_id)
-            result["rrf_score"] = rrf_score
+            result = {
+                "case_id": case_id,
+                "bm25_rank": bm25_ranks.get(case_id),
+                "semantic_rank": semantic_ranks.get(case_id),
+                "rrf_score": rrf_score
+            }
             results.append(result)
 
         return results
