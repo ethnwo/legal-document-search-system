@@ -63,15 +63,15 @@ class SemanticRetriever:
     
     def load_index(self):
         self.index = faiss.read_index(str(self.index_path))
-        self.chunk_case_indices = np.load(self.mapping_path).tolist()
+        self.chunk_case_indices = np.load(self.mapping_path)
 
         with open(self.chunks_path, "r", encoding="utf-8") as file:
-            self.chunks = json.load(file)
+            chunks = json.load(file)
 
         # Check that all stored index components have matching sizes.
         index_size = self.index.ntotal
         mapping_size = len(self.chunk_case_indices)
-        chunks_size = len(self.chunks)
+        chunks_size = len(chunks)
 
         if index_size != mapping_size or mapping_size != chunks_size:
             raise ValueError(
@@ -93,6 +93,8 @@ class SemanticRetriever:
                 f"Semantic index contains {len(invalid_indices)} "
                 "invalid case indices."
             )
+
+        del chunks
 
         print("Semantic index loaded and validated successfully.")
     
