@@ -1,3 +1,4 @@
+from pathlib import Path
 from sentence_transformers import SentenceTransformer
 from app.data.loader import load_cases
 import numpy as np
@@ -8,10 +9,10 @@ import json
 class SemanticRetriever:
     def __init__(self, cases):
         self.cases = cases
-        self.index_dir = "indexes/semantic"
-        self.index_path = os.path.join(self.index_dir, "index.faiss")
-        self.mapping_path = os.path.join(self.index_dir, "chunk_case_indices.npy")
-        self.chunks_path = os.path.join(self.index_dir, "chunks.json")
+        self.index_dir = Path(__file__).resolve().parents[2] / "indexes" / "semantic"
+        self.index_path = self.index_dir / "index.faiss"
+        self.mapping_path = self.index_dir / "chunk_case_indices.npy"
+        self.chunks_path = self.index_dir / "chunks.json"
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
 
         if os.path.exists(self.index_path) and os.path.exists(self.mapping_path) and os.path.exists(self.chunks_path):
@@ -51,7 +52,7 @@ class SemanticRetriever:
         print("Semantic index created successfully.")
 
         os.makedirs(self.index_dir, exist_ok = True)
-        faiss.write_index(self.index, self.index_path)
+        faiss.write_index(self.index, str(self.index_path))
         np.save(self.mapping_path, np.array(self.chunk_case_indices))
 
         with open(self.chunks_path, "w", encoding = "utf-8") as file:
@@ -59,14 +60,42 @@ class SemanticRetriever:
 
         print("Semantic index saved successfully.")
 
+    
     def load_index(self):
-        self.index = faiss.read_index(self.index_path)
+        self.index = faiss.read_index(str(self.index_path))
         self.chunk_case_indices = np.load(self.mapping_path).tolist()
 
         with open(self.chunks_path, "r", encoding="utf-8") as file:
             self.chunks = json.load(file)
 
-        print("Semantic index loaded successfully.")    
+        # Check that all stored index components have matching sizes.
+        index_size = self.index.ntotal
+        mapping_size = len(self.chunk_case_indices)
+        chunks_size = len(self.chunks)
+
+        if index_size != mapping_size or mapping_size != chunks_size:
+            raise ValueError(
+                "Semantic index files are inconsistent: "
+                f"FAISS vectors={index_size}, "
+                f"chunk mappings={mapping_size}, "
+                f"stored chunks={chunks_size}."
+            )
+
+        # Check that each chunk points to a valid case.
+        invalid_indices = [
+            case_index
+            for case_index in self.chunk_case_indices
+            if case_index < 0 or case_index >= len(self.cases)
+        ]
+
+        if invalid_indices:
+            raise ValueError(
+                f"Semantic index contains {len(invalid_indices)} "
+                "invalid case indices."
+            )
+
+        print("Semantic index loaded and validated successfully.")
+    
 
     def search(self, query, top_k=5):
         query_embedding = self.model.encode(
@@ -86,7 +115,7 @@ class SemanticRetriever:
 
             if (case_index not in case_scores or score > case_scores[case_index]):
                 case_scores[case_index] = float(score)
-
+                
         ranked_cases = sorted(case_scores.items(), key=lambda item:item[1], reverse=True)[:top_k]
         results = []
 

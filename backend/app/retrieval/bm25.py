@@ -50,7 +50,6 @@ class BM25Retriever:
     def search(self, query, top_k=5):
         tokenized_query = tokenize(query)
         corrected_query = self.fuzzy_correct(tokenized_query)
-        print(f"Corrected query: {' '.join(corrected_query)}")
         scores = self.bm25.get_scores(corrected_query)
         ranked_indices = scores.argsort()[::-1][:top_k]
         results = []

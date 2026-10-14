@@ -40,14 +40,6 @@ class RRF:
 
             rrf_scores[case_id] += 1 / (self.k + rank)
 
-        case_lookup = {}
-
-        for result in bm25_results:
-            case_lookup[result["case_id"]] = result
-
-        for result in semantic_results:
-            case_lookup[result["case_id"]] = result
-
         ranked_cases = sorted(rrf_scores.items(), key=lambda item:item[1], reverse=True)
 
         results = []
@@ -74,8 +66,7 @@ if __name__ == "__main__":
     print("RRF results:")
 
     for rank, result in enumerate(results, start=1):
-        print(f"\n{rank}. {result['case_name']}")
-        print(f"    Citation: {result['citation']}")
-        print(f"    BM25 rank: {result['bm25_rank']}")
-        print(f"    Semantic Rank: {result['semantic_rank']}")
-        print(f"    RRF score: {result['rrf_score']:.6f}")
+        print(f"\n{rank}. Case ID: {result['case_id']}")
+        print(f"   BM25 rank: {result['bm25_rank']}")
+        print(f"   Semantic rank: {result['semantic_rank']}")
+        print(f"   RRF score: {result['rrf_score']:.6f}")
