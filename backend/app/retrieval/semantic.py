@@ -15,7 +15,7 @@ class SemanticRetriever:
         self.chunks_path = self.index_dir / "chunks.json"
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
 
-        if os.path.exists(self.index_path) and os.path.exists(self.mapping_path) and os.path.exists(self.chunks_path):
+        if os.path.exists(self.index_path) and os.path.exists(self.mapping_path):
             self.load_index()
         else:
             self.build_index()
@@ -65,20 +65,15 @@ class SemanticRetriever:
         self.index = faiss.read_index(str(self.index_path))
         self.chunk_case_indices = np.load(self.mapping_path)
 
-        with open(self.chunks_path, "r", encoding="utf-8") as file:
-            chunks = json.load(file)
-
         # Check that all stored index components have matching sizes.
         index_size = self.index.ntotal
         mapping_size = len(self.chunk_case_indices)
-        chunks_size = len(chunks)
 
-        if index_size != mapping_size or mapping_size != chunks_size:
+        if index_size != mapping_size:
             raise ValueError(
                 "Semantic index files are inconsistent: "
                 f"FAISS vectors={index_size}, "
                 f"chunk mappings={mapping_size}, "
-                f"stored chunks={chunks_size}."
             )
 
         # Check that each chunk points to a valid case.
