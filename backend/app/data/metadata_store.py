@@ -4,8 +4,7 @@ from pathlib import Path
 DEFAULT_SOURCE = "Original dataset"
 
 def get_database_path():
-    backend_dir = Path(__file__).resolve().parents[2]
-    return backend_dir / "data" / "metadata.db"
+    return Path("/var/data/appdata/metadata.db")
 
 class MetadataStore:
     def __init__(self):

@@ -149,7 +149,7 @@ def get_case_html(case_id: str):
     filename = f"{page_number:04d}-01.html"
 
     # Locate the HTML file under the project's data/raw directory.
-    raw_dir = Path(__file__).resolve().parents[2] / "data" / "raw"
+    raw_dir = Path("/var/data/data/raw")
     html_path = (raw_dir / volume / "html" / filename).resolve()
 
     # Ensure the resolved path stays inside data/raw.

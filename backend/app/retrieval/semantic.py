@@ -9,7 +9,7 @@ import json
 class SemanticRetriever:
     def __init__(self, cases):
         self.cases = cases
-        self.index_dir = Path(__file__).resolve().parents[2] / "indexes" / "semantic"
+        self.index_dir = Path("/var/data/indexes/semantic")
         self.index_path = self.index_dir / "index.faiss"
         self.mapping_path = self.index_dir / "chunk_case_indices.npy"
         self.chunks_path = self.index_dir / "chunks.json"
