@@ -198,9 +198,9 @@ const handleCloseCase = () => {
               onChange={(event) => setSelectedMethod(event.target.value)}
               disabled={loading}
             >
-              <option value="bm25">Lexical (BM25)</option>
-              <option value="semantic">Semantic (all-MiniLM-L6-v2)</option>
-              <option value="hybrid">Hybrid (Reciprocal Rank Fusion)</option>
+              <option value="bm25">Lexical</option>
+              <option value="semantic">Semantic</option>
+              <option value="hybrid">Hybrid</option>
             </select>
           </div>
 
