@@ -175,7 +175,7 @@ const handleCloseCase = () => {
 
 
   return (
-    <main className="app">
+    <main className={`app ${hasSearched ? 'has-searched' : 'landing-page'}`}>
       <header className="header">
         <h1>Legal Document Search System</h1>
         <p>Search a collection of legal cases using lexical, semantic, or hybrid retrieval.</p>
@@ -200,7 +200,7 @@ const handleCloseCase = () => {
             >
               <option value="bm25">Lexical (BM25)</option>
               <option value="semantic">Semantic (all-MiniLM-L6-v2)</option>
-              <option value="hybrid">Hybrid (RRF)</option>
+              <option value="hybrid">Hybrid (Reciprocal Rank Fusion)</option>
             </select>
           </div>
 
