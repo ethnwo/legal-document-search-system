@@ -1,10 +1,18 @@
-import sqlite3
 from pathlib import Path
+import sqlite3
+import os
 
 DEFAULT_SOURCE = "Original dataset"
 
 def get_database_path():
-    return Path("/var/data/appdata/metadata.db")
+    backend_dir = Path(__file__).resolve().parents[2]
+
+    return Path(
+        os.getenv(
+            "METADATA_DB_PATH",
+            str(backend_dir / "data" / "metadata.db")
+        )
+    )
 
 class MetadataStore:
     def __init__(self):

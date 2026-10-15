@@ -9,16 +9,29 @@ import json
 class SemanticRetriever:
     def __init__(self, cases):
         self.cases = cases
-        self.index_dir = Path("/var/data/indexes/semantic")
+
+        project_root = Path(__file__).resolve().parents[2]
+
+        self.index_dir = Path(
+            os.getenv(
+                "SEMANTIC_INDEX_DIR",
+                str(project_root / "indexes" / "semantic")
+            )
+        )
+
         self.index_path = self.index_dir / "index.faiss"
         self.mapping_path = self.index_dir / "chunk_case_indices.npy"
         self.chunks_path = self.index_dir / "chunks.json"
+
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
 
-        if os.path.exists(self.index_path) and os.path.exists(self.mapping_path):
+        if self.index_path.exists() and self.mapping_path.exists():
             self.load_index()
         else:
-            self.build_index()
+            raise FileNotFoundError(
+                f"Existing semantic index not found in: {self.index_dir}. "
+                "Check that index.faiss and chunk_case_indices.npy exist."
+            )
 
     def build_index(self):
         self.chunks = []
@@ -65,33 +78,12 @@ class SemanticRetriever:
         self.index = faiss.read_index(str(self.index_path))
         self.chunk_case_indices = np.load(self.mapping_path)
 
-        # Check that all stored index components have matching sizes.
-        index_size = self.index.ntotal
-        mapping_size = len(self.chunk_case_indices)
-
-        if index_size != mapping_size:
+        if self.index.ntotal != len(self.chunk_case_indices):
             raise ValueError(
-                "Semantic index files are inconsistent: "
-                f"FAISS vectors={index_size}, "
-                f"chunk mappings={mapping_size}, "
+                "Semantic index and chunk mapping have different sizes."
             )
 
-        # Check that each chunk points to a valid case.
-        invalid_indices = [
-            case_index
-            for case_index in self.chunk_case_indices
-            if case_index < 0 or case_index >= len(self.cases)
-        ]
-
-        if invalid_indices:
-            raise ValueError(
-                f"Semantic index contains {len(invalid_indices)} "
-                "invalid case indices."
-            )
-
-        del chunks
-
-        print("Semantic index loaded and validated successfully.")
+        print("Semantic index loaded successfully.")
     
 
     def search(self, query, top_k=5):

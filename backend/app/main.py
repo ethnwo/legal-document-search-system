@@ -10,6 +10,7 @@ from datetime import date
 from pathlib import Path
 import time
 import re
+import os
 
 app = FastAPI()
 app.add_middleware(
@@ -149,7 +150,12 @@ def get_case_html(case_id: str):
     filename = f"{page_number:04d}-01.html"
 
     # Locate the HTML file under the project's data/raw directory.
-    raw_dir = Path("/var/data/data/raw")
+    raw_dir = Path(
+        os.getenv(
+            "RAW_DATA_DIR",
+            str(Path(__file__).resolve().parents[2] / "data" / "raw")
+        )
+    ).resolve()
     html_path = (raw_dir / volume / "html" / filename).resolve()
 
     # Ensure the resolved path stays inside data/raw.
