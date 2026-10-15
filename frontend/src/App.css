@@ -1,10 +1,15 @@
 .app {
   width: 100%;
   max-width: 1000px;
+  min-height: 100vh;
   margin: 0 auto;
-  padding: 60px 24px;
+  padding: 40px 24px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
+
 
 .header {
   text-align: center;
@@ -28,13 +33,18 @@
 
 .search-bar {
   display: flex;
+  align-items: stretch;
   gap: 12px;
+  width: 100%;
 }
 
 .search-bar input {
-  flex: 1;
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
   padding: 14px 16px;
   font-size: 16px;
+  font-family: inherit;
   border: 1px solid #ccc;
   border-radius: 8px;
   outline: none;
@@ -71,7 +81,7 @@
 .placeholder {
   text-align: center;
   color: #777;
-  padding: 40px 0;
+  padding: 24px 0;
 }
 
 .results {
@@ -132,11 +142,10 @@
 .error {
   text-align: center;
   color: #c62828;
-  padding: 20px;
 }
 
 @media (max-width: 700px) {
-  .app {
+.app {
     padding: 40px 16px;
   }
 
@@ -160,25 +169,153 @@
   .result-rank {
     min-width: auto;
   }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+.filters-toggle {
+  padding: 18px 42px;
 }
 
-.search-section {
-  margin-bottom: 40px;
+  .filter-actions {
+    flex-direction: column;
+  }
+
+  .filter-actions button {
+    width: 100%;
+  }
+
+  .case-modal-backdrop {
+    padding: 10px;
+  }
+
+  .case-modal {
+    height: 95vh;
+    border-radius: 8px;
+  }
+
+  .case-modal-header {
+    padding: 16px;
+  }
+
+  .case-modal-header h2 {
+    font-size: 17px;
+  }
+
+  .result-actions-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+
+.search-results-content {
+  animation: results-enter 300ms ease-out both;
+}
+
+@keyframes results-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.search-results-content {
+  animation: results-fade-in 250ms ease-out both;
+}
+
+@keyframes results-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-results-content {
+    animation: none;
+  }
+}
+
+.filters-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 44px;
+  padding: 15px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.filters-toggle h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+  text-align: center;
+}
+
+.filters-toggle::after {
+  content: "";
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid #333;
+  border-bottom: 1.5px solid #333;
+  transform: translateY(-70%) rotate(45deg);
+  transition: transform 220ms ease;
 }
 
 .filters-panel {
   margin-top: 20px;
-  padding: 24px;
+  padding: 0;
   border: 1px solid #ddd;
   border-radius: 10px;
-  background: #fafafa;
+  background: #fff;
+  overflow: hidden;
 }
 
-.filters-panel h2 {
-  margin: 0 0 20px;
-  font-size: 20px;
-  color: #333;
+.filters-panel.is-open .filters-toggle::after {
+  transform: translateY(-30%) rotate(225deg);
 }
+
+.filters-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 250ms ease;
+}
+
+.filters-panel.is-open .filters-content {
+  grid-template-rows: 1fr;
+}
+
+.filters-content-inner {
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 24px;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.filters-panel.is-open .filters-content-inner {
+  padding-bottom: 24px;
+  opacity: 1;
+}
+
 
 .filters-grid {
   display: grid;
@@ -227,6 +364,7 @@
 .filter-actions {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 12px;
   margin-top: 24px;
 }
@@ -261,50 +399,36 @@
   background: #eee;
 }
 
-@media (max-width: 700px) {
-  .filters-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .filters-panel {
-    padding: 18px;
-  }
-
-  .filter-actions {
-    flex-direction: column;
-  }
-
-  .filter-actions button {
-    width: 100%;
-  }
-}
-
 /* Retrieval method selector */
 .retrieval-method-selector {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-  max-width: 360px;
+  justify-content: center;
+  width: 230px;
+  flex: 0 0 230px;
+  margin-bottom: 0;
 }
 
-.retrieval-method-selector label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-}
 
 .retrieval-method-selector select {
+  appearance: none;
+  -webkit-appearance: none;
   width: 100%;
   box-sizing: border-box;
-  padding: 12px;
+  padding: 14px 38px 14px 12px;
   font-size: 15px;
   font-family: inherit;
   color: #222;
-  background: white;
+  background-color: white;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23222' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
   border: 1px solid #ccc;
   border-radius: 8px;
+  cursor: pointer;
 }
+
 
 .retrieval-method-selector select:focus {
   outline: none;
@@ -319,6 +443,7 @@
 .search-timings {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 12px 24px;
   margin: 12px 0 20px;
   color: #555;
@@ -334,8 +459,17 @@
 
 
 /* Full-case viewing */
-.view-case-button {
+.result-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin-top: 18px;
+}
+
+.view-case-button {
+  flex-shrink: 0;
+  margin-top: 0;
   padding: 10px 16px;
   border: 1px solid #222;
   border-radius: 7px;
@@ -386,12 +520,20 @@
   gap: 16px;
   padding: 20px 24px;
   border-bottom: 1px solid #ddd;
+  background: #fff;
+}
+
+.case-modal-header > div {
+  flex: 1;
+  min-width: 0;
 }
 
 .case-modal-header h2 {
   margin: 0 0 8px;
+  color: #222;
   font-size: 20px;
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .case-modal-header p {
@@ -404,17 +546,17 @@
   flex-shrink: 0;
   width: 38px;
   height: 38px;
-  border: 1px solid #ddd;
+  border: 1px solid #222;
   border-radius: 7px;
-  background: white;
-  color: #222;
+  background: #222;
+  color: #fff;
   font-size: 28px;
   line-height: 1;
   cursor: pointer;
 }
 
 .close-case-button:hover {
-  background: #f1f1f1;
+  background: #444;
 }
 
 .case-modal-content {
@@ -429,23 +571,4 @@
   height: 100%;
   border: none;
   background: white;
-}
-
-@media (max-width: 700px) {
-  .case-modal-backdrop {
-    padding: 10px;
-  }
-
-  .case-modal {
-    height: 95vh;
-    border-radius: 8px;
-  }
-
-  .case-modal-header {
-    padding: 16px;
-  }
-
-  .case-modal-header h2 {
-    font-size: 17px;
-  }
 }
