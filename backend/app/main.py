@@ -194,7 +194,7 @@ def get_case_html(case_id: str):
     
     # Return the original HTML document.
     return HTMLResponse(
-        content=html_path.read_text(encoding="utf-8", errors="replace")
+        content=content
     )
 
 @app.get("/filters")
