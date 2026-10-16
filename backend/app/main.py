@@ -180,10 +180,17 @@ def get_case_html(case_id: str):
     print("Exists:", html_path.exists())
     print("Is file:", html_path.is_file())
 
-    content = html_path.read_text(
-        encoding="utf-8",
-        errors="replace",
-    )
+    try:
+        with html_path.open("rb") as f:
+            raw_content = f.read()
+
+        print("Binary read successful:", len(raw_content), "bytes")
+
+        content = raw_content.decode("utf-8", errors="replace")
+
+    except OSError as e:
+        print("Binary read failed:", repr(e))
+        raise
     
     # Return the original HTML document.
     return HTMLResponse(
