@@ -175,6 +175,16 @@ def get_case_html(case_id: str):
             detail=f"HTML file not found for citation: {citation}"
         )
 
+    print("HTML path:", repr(str(html_path)))
+    print("Path length:", len(str(html_path)))
+    print("Exists:", html_path.exists())
+    print("Is file:", html_path.is_file())
+
+    content = html_path.read_text(
+        encoding="utf-8",
+        errors="replace",
+    )
+    
     # Return the original HTML document.
     return HTMLResponse(
         content=html_path.read_text(encoding="utf-8", errors="replace")
