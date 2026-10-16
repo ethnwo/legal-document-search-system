@@ -351,28 +351,28 @@ const handleCloseCase = () => {
                     <div className="result-actions-row">
                       <div className="ranking-info">
                         {resultMethod === 'bm25' && (
-                          <span>
+                          <span className="ranking-bubble bm25-score">
                             BM25 Score: {result.score.toFixed(4)}
                           </span>
                         )}
 
                         {resultMethod === 'semantic' && (
-                          <span>
+                          <span className="ranking-bubble semantic-score">
                             Semantic Similarity: {result.score.toFixed(4)}
                           </span>
                         )}
 
                         {resultMethod === 'hybrid' && (
                           <>
-                            <span>
+                            <span className="ranking-bubble rrf-score">
                               RRF Score: {result.rrf_score.toFixed(6)}
                             </span>
 
-                            <span>
+                            <span className="ranking-bubble bm25-rank">
                               BM25 Rank: #{result.bm25_rank ?? '-'}
                             </span>
 
-                            <span>
+                            <span className="ranking-bubble semantic-rank">
                               Semantic Rank: #{result.semantic_rank ?? '-'}
                             </span>
                           </>

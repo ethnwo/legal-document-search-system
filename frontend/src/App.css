@@ -134,8 +134,27 @@
 .ranking-info span {
   padding: 6px 10px;
   border-radius: 6px;
-  background: #f1f1f1;
   font-size: 14px;
+}
+
+/* BM25: Blue */
+.ranking-bubble.bm25-score,
+.ranking-bubble.bm25-rank {
+  background: #DBEAFE;
+  color: #1D4ED8;
+}
+
+/* Semantic: Green */
+.ranking-bubble.semantic-score,
+.ranking-bubble.semantic-rank {
+  background: #D1FAE5;
+  color: #047857;
+}
+
+/* Hybrid fusion score: Purple */
+.ranking-bubble.rrf-score {
+  background: #F3E8FF;
+  color: #7E22CE;
 }
 
 .error {
