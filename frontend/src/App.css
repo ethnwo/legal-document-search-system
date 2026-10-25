@@ -740,16 +740,16 @@ body:has(.case-modal-backdrop) {
 
 @supports (-webkit-touch-callout: none) {
   .filter-field input[type="date"] {
-    display: block;
     width: 100%;
     min-width: 0;
     max-width: 100%;
-    min-height: 48px;
     box-sizing: border-box;
-    margin: 0;
-    padding: 12px;
-    text-align: left;
-    -webkit-appearance: auto;
-    appearance: auto;
+    -webkit-appearance: none;
+    appearance: none;
   }
+}
+
+.filter-field select,
+.filter-field input {
+  height: 48px;
 }
