@@ -744,9 +744,12 @@ body:has(.case-modal-backdrop) {
     width: 100%;
     min-width: 0;
     max-width: 100%;
+    min-height: 48px;
     box-sizing: border-box;
     margin: 0;
-    -webkit-appearance: none;
-    appearance: none;
+    padding: 12px;
+    text-align: left;
+    -webkit-appearance: auto;
+    appearance: auto;
   }
 }
