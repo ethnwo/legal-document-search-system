@@ -251,13 +251,23 @@
   }
 
   .filters-grid {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .filter-field {
     width: 100%;
     min-width: 0;
+  }
+
+  .filter-field input[type="date"] {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   }
 
   .filter-field select,
