@@ -737,3 +737,16 @@ body:has(.case-modal-backdrop) {
     justify-content: flex-start;
   }
 }
+
+@supports (-webkit-touch-callout: none) {
+  .filter-field input[type="date"] {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+}
