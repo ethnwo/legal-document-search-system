@@ -51,6 +51,12 @@ class MetadataStore:
                 ON cases(court)
             """)
 
+            connection.execute("""
+                CREATE INDEX IF NOT EXISTS
+                idx_cases_jurisdiction
+                ON cases(jurisdiction)
+            """)
+
     def import_cases(self, cases):
         with self.connect() as connection:
             for case in cases:
